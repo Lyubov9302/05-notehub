@@ -10,11 +10,11 @@ const API_TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
 
 export const FetchNotes = async (
   search: string,
-  perPage: number,
-  page: number
+  page: number,
+  perPage: number
 ): Promise<FetchNotesResponse> => {
   const response = await axios.get<FetchNotesResponse>(
-    "https://notehub-public.goit.study/api/docs",
+    "https://notehub-public.goit.study/api/notes",
     {
       params: {
         search: search,
