@@ -1,7 +1,7 @@
 import css from "./App.module.css";
 import { useState } from "react";
 import NoteList from "../NoteList/NoteList";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { FetchNotes } from "../../services/noteService";
 import {
@@ -10,13 +10,16 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import ReactPaginate from "react-paginate";
+import Pagination from "../Pagination/Pagination";
+import { useDebouncedCallback } from "use-debounce";
+import Modal from "../Modal/Modal";
 
 export default function App() {
   const queryClient = useQueryClient();
   const [searchValue, setSearchValue] = useState("");
   const [page, setPage] = useState(1);
-  const [perPage] = useState(12);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSearch = (query) => {
     setSearchValue(query);
@@ -24,62 +27,58 @@ export default function App() {
   };
 
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ["notes", searchValue, page, perPage],
-    queryFn: () => FetchNotes(searchValue, page, perPage),
+    queryKey: ["notes", searchValue, page],
+    queryFn: () => FetchNotes(searchValue, page),
     placeholderData: keepPreviousData,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => deleteNote(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-      toast.success("Нотатка успішно видалена!");
-    },
-    onError: () => {
-      toast.error("Помилка при видаленні нотатки.");
-    },
   });
 
   useEffect(() => {
     if (isSuccess && data?.notes.length === 0 && searchValue !== "") {
-      toast.error("No movies found for your request");
+      toast.error("No notes found for your request");
     }
   }, [isSuccess, data, searchValue]);
 
-  const handleDelete = (id) => {
-    deleteMutation.mutate(id);
-  };
-  const handlePageClick = (event) => {
-    setPage(event.selected + 1);
-  };
+  function openModal() {
+    setIsModalOpen(true);
+  }
 
-  const hasNotes = data?.notes && data.notes.length > 0;
+  function closeModal() {
+    setIsModalOpen(false);
+  }
+
+  const updateSearchWord = useDebouncedCallback((searchWord: string) => {
+    setSearchValue(searchWord);
+    setPage(1);
+  }, 500);
+
   const totalPages = data?.totalPages ?? 0;
 
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        {totalPages > 1 && (
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel=">"
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={5}
-            pageCount={totalPages}
-            previousLabel="<"
-            renderOnZeroPageCount={null}
+        <SearchBox onChange={updateSearchWord} />
+        {isSuccess && totalPages > 1 && (
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
           />
         )}
-        {/* Компонент SearchBox */}
-        {/* Пагінація */}
-        {/* Кнопка створення нотатки */}
+        <button
+          className={css.button}
+          onClick={openModal}
+        >
+          Create note +
+        </button>
       </header>
-      {hasNotes && (
-        <NoteList
-          notes={data.notes}
-          onDelete={handleDelete}
+      {data?.notes && data.notes.length > 0 && <NoteList notes={data.notes} />}
+      {isModalOpen && (
+        <Modal
+          onClose={closeModal}
+          children={<NoteForm onClose={closeModal} />}
         />
       )}
+      <Toaster />
     </div>
   );
 }
