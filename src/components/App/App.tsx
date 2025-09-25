@@ -12,7 +12,6 @@ import Modal from "../Modal/Modal";
 export default function App() {
   const [searchValue, setSearchValue] = useState("");
   const [page, setPage] = useState(1);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSearch = (query: string) => {
@@ -26,12 +25,6 @@ export default function App() {
     enabled: !!searchValue,
     placeholderData: keepPreviousData,
   });
-
-  useEffect(() => {
-    if (isSuccess && data?.notes.length === 0 && searchValue !== "") {
-      toast.error("No notes found for your request");
-    }
-  }, [isSuccess, data, searchValue]);
 
   function openModal() {
     setIsModalOpen(true);
@@ -66,7 +59,9 @@ export default function App() {
           Create note +
         </button>
       </header>
-      {data?.notes && data.notes.length > 0 && <NoteList notes={data.notes} />}
+      {data !== undefined && data.notes.length > 0 && (
+        <NoteList notes={data.notes} />
+      )}
       {isModalOpen && (
         <Modal
           onClose={closeModal}
