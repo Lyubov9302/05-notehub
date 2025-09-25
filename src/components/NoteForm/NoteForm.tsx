@@ -7,6 +7,7 @@ import css from "./NoteForm.module.css";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { Field, Formik, FormikHelpers } from "formik";
+import { CreateNote } from "../../services/noteService";
 
 interface NoteFormProps {
   onClose: () => void;
@@ -33,7 +34,7 @@ export default function NoteForn({ onClose }: NoteFormProps) {
   const QueryClient = useQueryClient();
 
   const createNoteMutate = useMutation({
-    mutationFn: (data: FormData) => createNote(data),
+    mutationFn: (data: FormData) => CreateNote(data),
     onSuccess() {
       QueryClient.invalidateQueries({ queryKey: ["notes"] });
       onClose();

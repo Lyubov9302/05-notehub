@@ -4,24 +4,18 @@ import NoteList from "../NoteList/NoteList";
 import toast, { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { FetchNotes } from "../../services/noteService";
-import {
-  keepPreviousData,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Pagination from "../Pagination/Pagination";
 import { useDebouncedCallback } from "use-debounce";
 import Modal from "../Modal/Modal";
 
 export default function App() {
-  const queryClient = useQueryClient();
   const [searchValue, setSearchValue] = useState("");
   const [page, setPage] = useState(1);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSearch = (query) => {
+  const handleSearch = (query: string) => {
     setSearchValue(query);
     setPage(1);
   };
@@ -29,6 +23,7 @@ export default function App() {
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["notes", searchValue, page],
     queryFn: () => FetchNotes(searchValue, page),
+    enabled: !!searchValue,
     placeholderData: keepPreviousData,
   });
 
@@ -56,7 +51,7 @@ export default function App() {
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        <SearchBox onChange={updateSearchWord} />
+        <SearchBox onChange={handleSearch} />
         {isSuccess && totalPages > 1 && (
           <Pagination
             currentPage={page}
@@ -75,7 +70,7 @@ export default function App() {
       {isModalOpen && (
         <Modal
           onClose={closeModal}
-          children={<NoteForm onClose={closeModal} />}
+          children={<NoteForm />}
         />
       )}
       <Toaster />
