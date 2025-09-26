@@ -44,7 +44,7 @@ export default function App() {
         <SearchBox onChange={updateSearchWord} />
         {isSuccess && totalPages > 1 && (
           <Pagination
-            currentPage={page}
+            page={page}
             totalPages={totalPages}
             onChange={setPage}
           />
