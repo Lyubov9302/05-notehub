@@ -7,7 +7,7 @@ export interface FetchNotesResponse {
 }
 
 interface Options {
-  params: {
+  params?: {
     search: string;
     page: number;
     perPage: number;
@@ -18,6 +18,12 @@ interface Options {
 }
 
 const API_TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
+const authConfig = {
+  headers: {
+    Authorization: `Bearer ${API_TOKEN}`,
+  },
+};
+
 axios.defaults.baseURL = "https://notehub-public.goit.study/api";
 
 export const FetchNotes = async (
@@ -25,13 +31,11 @@ export const FetchNotes = async (
   page: number
 ): Promise<FetchNotesResponse> => {
   const options: Options = {
+    ...authConfig,
     params: {
       search: searchWord,
       page: page,
       perPage: 12,
-    },
-    headers: {
-      Authorization: `Bearer ${API_TOKEN}`,
     },
   };
   const response = await axios.get<FetchNotesResponse>("/notes", options);
@@ -39,11 +43,15 @@ export const FetchNotes = async (
 };
 
 export const CreateNote = async (data: CreateNoteRequest) => {
-  const response = await axios.post<CreateNoteRequest>("/notes", data);
+  const response = await axios.post<CreateNoteRequest>(
+    "/notes",
+    data,
+    authConfig
+  );
   return response.data;
 };
 
 export const DeleteNote = async (id: string) => {
-  const response = await axios.delete<Note>(`/notes/${id}`);
+  const response = await axios.delete<Note>(`/notes/${id}`, authConfig);
   return response.data;
 };
