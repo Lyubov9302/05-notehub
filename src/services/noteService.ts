@@ -21,12 +21,12 @@ const API_TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
 axios.defaults.baseURL = "https://notehub-public.goit.study/api";
 
 export const FetchNotes = async (
-  search: string,
+  searchWord: string,
   page: number
 ): Promise<FetchNotesResponse> => {
   const options: Options = {
     params: {
-      search: search,
+      search: searchWord,
       page: page,
       perPage: 12,
     },

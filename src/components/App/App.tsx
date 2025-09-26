@@ -17,6 +17,11 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const updateSearchWord = useDebouncedCallback((searchWord: string) => {
+    setSearchValue(searchWord);
+    setPage(1);
+  }, 500);
+
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["notes", searchValue, page],
     queryFn: () => FetchNotes(searchValue, page),
@@ -30,11 +35,6 @@ export default function App() {
   function closeModal() {
     setIsModalOpen(false);
   }
-
-  const updateSearchWord = useDebouncedCallback((searchWord: string) => {
-    setSearchValue(searchWord);
-    setPage(1);
-  }, 500);
 
   const totalPages = data?.totalPages ?? 0;
 
