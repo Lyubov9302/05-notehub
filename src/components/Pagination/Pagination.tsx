@@ -1,10 +1,11 @@
 import ReactPaginate from "react-paginate";
 import css from "./Pagination.module.css";
+import { Dispatch } from "react";
 
 interface PaginationProps {
   totalPages: number;
   page: number;
-  onChange: (page: number) => void;
+  onChange: Dispatch<SetStateAction<number>>;
 }
 
 export default function Pagination({
