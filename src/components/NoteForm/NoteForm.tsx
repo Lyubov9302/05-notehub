@@ -4,10 +4,10 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import css from "./NoteForm.module.css";
-import toast from "react-hot-toast";
 import * as Yup from "yup";
-import { Field, Formik, FormikHelpers } from "formik";
+import { Field, Form, Formik, FormikHelpers } from "formik";
 import { CreateNote } from "../../services/noteService";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
 
 interface NoteFormProps {
   onClose: () => void;
@@ -30,7 +30,7 @@ const OrderSchema = Yup.object().shape({
     .required("Tag is required"),
 });
 
-export default function NoteForn({ onClose }: NoteFormProps) {
+export default function NoteForm({ onClose }: NoteFormProps) {
   const QueryClient = useQueryClient();
 
   const createNoteMutate = useMutation({
@@ -39,19 +39,16 @@ export default function NoteForn({ onClose }: NoteFormProps) {
       QueryClient.invalidateQueries({ queryKey: ["notes"] });
       onClose();
     },
-    onError(error) {
-      toast.error(error.message);
-    },
   });
 
-  function handleSubmit(
+  const handleSubmit = (
     values: FormData,
     formikHelpers: FormikHelpers<FormData>
-  ) {
+  ) => {
     createNoteMutate.mutate(values, {
       onSuccess: () => formikHelpers.resetForm(),
     });
-  }
+  };
 
   return (
     <Formik
@@ -68,7 +65,8 @@ export default function NoteForn({ onClose }: NoteFormProps) {
             name="title"
             className={css.input}
           />
-          <span
+          <ErrorMessage
+            component="span"
             name="title"
             className={css.error}
           />
@@ -83,7 +81,8 @@ export default function NoteForn({ onClose }: NoteFormProps) {
             rows={8}
             className={css.textarea}
           />
-          <span
+          <ErrorMessage
+            component="span"
             name="content"
             className={css.error}
           />
@@ -103,7 +102,8 @@ export default function NoteForn({ onClose }: NoteFormProps) {
             <option value="Meeting">Meeting</option>
             <option value="Shopping">Shopping</option>
           </Field>
-          <span
+          <ErrorMessage
+            component="span"
             name="tag"
             className={css.error}
           />

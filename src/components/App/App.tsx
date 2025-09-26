@@ -1,23 +1,21 @@
 import css from "./App.module.css";
 import { useState } from "react";
 import NoteList from "../NoteList/NoteList";
-import toast, { Toaster } from "react-hot-toast";
-import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 import { FetchNotes } from "../../services/noteService";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Pagination from "../Pagination/Pagination";
 import { useDebouncedCallback } from "use-debounce";
 import Modal from "../Modal/Modal";
+import Loader from "../Loader/Loader";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import NoteForm from "../NoteForm/NoteForm";
+import SearchBox from "../SearchBox/SearchBox";
 
 export default function App() {
   const [searchValue, setSearchValue] = useState("");
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleSearch = (query: string) => {
-    setSearchValue(query);
-    setPage(1);
-  };
 
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["notes", searchValue, page],
@@ -44,12 +42,12 @@ export default function App() {
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        <SearchBox onChange={handleSearch} />
+        <SearchBox onChange={updateSearchWord} />
         {isSuccess && totalPages > 1 && (
           <Pagination
             currentPage={page}
             totalPages={totalPages}
-            onPageChange={setPage}
+            onChange={setPage}
           />
         )}
         <button
@@ -59,13 +57,18 @@ export default function App() {
           Create note +
         </button>
       </header>
-      {data !== undefined && data.notes.length > 0 && (
-        <NoteList notes={data.notes} />
+      {isLoading && <Loader />}
+      {isError && <ErrorMessage text="Error, please try again" />}
+      {data !== undefined && data?.notes.length === 0 && (
+        <ErrorMessage text="No notes found" />
+      )}
+      {data !== undefined && data?.notes.length > 0 && (
+        <NoteList notes={data?.notes} />
       )}
       {isModalOpen && (
         <Modal
           onClose={closeModal}
-          children={<NoteForm />}
+          children={<NoteForm onClose={closeModal} />}
         />
       )}
       <Toaster />
