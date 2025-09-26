@@ -8,12 +8,13 @@ import * as Yup from "yup";
 import { Field, Form, Formik, FormikHelpers } from "formik";
 import { CreateNote } from "../../services/noteService";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import { CreateNoteRequest } from "../../types/note";
 
 interface NoteFormProps {
   onClose: () => void;
 }
 
-const defaultValues: FormData = {
+const defaultValues: CreateNoteRequest = {
   title: "",
   content: "",
   tag: "Todo",
@@ -34,7 +35,7 @@ export default function NoteForm({ onClose }: NoteFormProps) {
   const QueryClient = useQueryClient();
 
   const createNoteMutate = useMutation({
-    mutationFn: (data: FormData) => CreateNote(data),
+    mutationFn: (data: CreateNoteRequest) => CreateNote(data),
     onSuccess() {
       QueryClient.invalidateQueries({ queryKey: ["notes"] });
       onClose();
@@ -42,8 +43,8 @@ export default function NoteForm({ onClose }: NoteFormProps) {
   });
 
   const handleSubmit = (
-    values: FormData,
-    formikHelpers: FormikHelpers<FormData>
+    values: CreateNoteRequest,
+    formikHelpers: FormikHelpers<CreateNoteRequest>
   ) => {
     createNoteMutate.mutate(values, {
       onSuccess: () => formikHelpers.resetForm(),
