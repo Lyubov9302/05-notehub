@@ -20,6 +20,7 @@ export default function App() {
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["notes", searchValue, page],
     queryFn: () => FetchNotes(searchValue, page),
+
     placeholderData: keepPreviousData,
   });
 
