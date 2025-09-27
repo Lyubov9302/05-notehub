@@ -42,16 +42,12 @@ export const FetchNotes = async (
   return response.data;
 };
 
-export const CreateNote = async (data: CreateNoteRequest) => {
-  const response = await axios.post<CreateNoteRequest>(
-    "/notes",
-    data,
-    authConfig
-  );
+export const CreateNote = async (data: CreateNoteRequest): Promise<Note> => {
+  const response = await axios.post<Note>("/notes", data, authConfig);
   return response.data;
 };
 
-export const DeleteNote = async (id: string) => {
+export const DeleteNote = async (id: string): Promise<Note> => {
   const response = await axios.delete<Note>(`/notes/${id}`, authConfig);
   return response.data;
 };

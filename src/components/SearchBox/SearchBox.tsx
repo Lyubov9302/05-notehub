@@ -1,11 +1,11 @@
 import { ChangeEvent } from "react";
 import css from "./SearchBox.module.css";
 
-interface SeacrhBoxProps {
+interface SearchBoxProps {
   onChange: (searchWord: string) => void;
 }
 
-export default function SearchBox({ onChange }: SeacrhBoxProps) {
+export default function SearchBox({ onChange }: SearchBoxProps) {
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     onChange(event.target.value);
   }
